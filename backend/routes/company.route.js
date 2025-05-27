@@ -9,7 +9,7 @@ const router = express.Router();
 
 router.route('/register').post( isAuthenticated , registerCompany)   
 router.route('/get').get( isAuthenticated , getCompanies)
-router.route('/get/:id').get( isAuthenticated , getCompanyById)
-router.route('/update/:id').put( isAuthenticated , updateCompany)
+router.get('/get/:id', isAuthenticated , getCompanyById) // we are using only single http request so can use this 
+router.put('/update/:id', isAuthenticated , updateCompany)
 
 export default router;
