@@ -14,7 +14,7 @@ export const register = async (req, res) => {
         const { fullname, email, phoneNumber, password, role } = req.body; //dynamically data lelo
         if (!fullname || !email || !phoneNumber || !password || !role) {
             return res.status(400).json({
-                message: "Something is missing in reg",
+                message: "Something is missing",
                 success: false
             });
         };
