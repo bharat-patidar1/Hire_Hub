@@ -20,8 +20,8 @@ status : {
     type :  String ,
     //jha pr bhi option ho vha enum use kro 
     enum : ["pending" , "accepted" , "rejected"],
-    default : "Pending"
+    default : "pending"
 }
-},{collection : "Application"},{timestamps : true})
+},{collection : "Application", timestamps : true})
 
 export const Application = mongoose.model("Application" , applicationSchema); 

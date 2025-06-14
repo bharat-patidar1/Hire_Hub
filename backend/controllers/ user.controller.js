@@ -4,6 +4,8 @@
 import { User } from "../models/user.model.js";
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
+import getDataUri from "../utils/datauri.js";
+import cloudinary from "../utils/cloudinary.js";
 
 //I dont add JWT security (token in it)
 
@@ -18,6 +20,9 @@ export const register = async (req, res) => {
                 success: false
             });
         };
+        const file = req.file
+        const fileUri = getDataUri(file)
+        const cloudResponse = await cloudinary.uploader.upload(fileUri.content)
         //ab check krenge ki user already exist to nhi krta h  . uske liye User collection ko get kro 
         const user = await User.findOne({ email });
         //age user already exist krta h i.e. uska data found hota h then eror
@@ -35,7 +40,10 @@ export const register = async (req, res) => {
             email,
             phoneNumber,
             password: hashedPassword,
-            role
+            role,
+            profile: {
+                profilePhoto: cloudResponse.secure_url
+            }
         })
         return res.status(201).json({
             message: "Account Created Successfully",
@@ -89,7 +97,6 @@ export const login = async (req, res) => {
             phoneNumber: user.phoneNumber,
             role: user.role,
             profile: user.profile
-
         }
 
         //ab hum security k liye token generate krenge 
@@ -113,7 +120,7 @@ export const login = async (req, res) => {
 export const logout = async (req, res) => {
     try {
 
-        return res.status(200).cookie("token" , "" , {maxAge : 0}).json({
+        return res.status(200).cookie("token", "", { maxAge: 0 }).json({
             message: "logged Out Successfully",
             success: true
         })
@@ -126,16 +133,16 @@ export const updateProfile = async (req, res) => {
     try {
         //profile update krne k liye apne ko updated data receive hoga body se 
         const { fullname, email, phoneNumber, bio, skills } = req.body
-        const file = req.file;
 
-        //cloudinary aaega idhar
-
+        const file = req.file
+        const fileUri = getDataUri(file)
+        const cloudResponse = await cloudinary.uploader.upload(fileUri.content)
 
 
         // yha pr String ki form m skills aaega to usko array m convert krna h so add comma (,) in it 
-        let skilLsArray
+        let skillsArray
         if (skills) {
-            skilLsArray = skills.split(",");
+            skillsArray = skills.split(",");
         }
         //for more security we also talke userId
         const userId = req.id; // ye middleware authentication se aaega y id user ki h (in User collection) it is unique
@@ -146,9 +153,13 @@ export const updateProfile = async (req, res) => {
         if (email) user.email = email
         if (phoneNumber) user.phoneNumber = phoneNumber
         if (bio) user.profile.bio = bio
-        if (skills) user.profile.skills = skilLsArray
+        if (skills) user.profile.skills = skillsArray
 
         //resume comes here later
+        if (cloudResponse) {
+            user.profile.resume = cloudResponse.secure_url// save the resume url by claudinary
+            user.profile.resumeOriginalName = file.originalname;
+        }
 
         //ab tk user update hogya h ab usko daldo vapus 
         await user.save();
@@ -161,7 +172,6 @@ export const updateProfile = async (req, res) => {
             phoneNumber: user.phoneNumber,
             role: user.role,
             profile: user.profile
-
         }
         return res.status(200).json({
             message: "Profile updted successfully",

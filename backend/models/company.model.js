@@ -23,6 +23,6 @@ userId  :{
     ref : "User",    // recruiter ki id hi vha use hogi
     required : true
 }
-},{collection : "Company"},{timestamps:true})
+},{collection : "Company",timestamps:true})
 
 export const Company = mongoose.model("Company" , companySchema);

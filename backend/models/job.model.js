@@ -13,7 +13,7 @@ const jobSchema = new mongoose.Schema({
         type : String
     }] ,
     salary : {
-        type : Number  ,
+        type : String  ,
         required : true
     },
     location : {
@@ -27,9 +27,9 @@ const jobSchema = new mongoose.Schema({
     experience : {
         type : Number,
         required : true
-    },
+    },  
     position : {
-        type : Number ,
+        type : String ,
         required : true  
     },
     //now it is the relation between Job and Company 
@@ -53,7 +53,7 @@ const jobSchema = new mongoose.Schema({
         ref : 'Application',  
         }
     ]
-},{collection : "Job"},{timestamps:true})
+},{collection : "Job",timestamps : true})
 
  
 // ek database ki collection for Job 
